@@ -91,8 +91,6 @@ MaterialList  Code  12 DUMMY SINGLE
 MaterialList PartNumbers GENERATED
 MaterialList  GRIDLINES ON
 MaterialList TableDefinition Column 1 PARTNUMBER with Width 3
-
-
 Column 2 DESCRIPTION with Width 54
 Column 3 BORE with Width 8
 Column 4 ITEMCODE with Width 8
@@ -102,7 +100,6 @@ Compipe MTO DRWG
 Compipe Itemcodes USER
 Compipe Descriptions SHORT
 Compipe Supports ON
-
 ATEX 222 'SLOPE'
 Atext 252 ''
 Atext 255 'THE SAME LINE No. SHEET.'
@@ -134,7 +131,6 @@ ATEX 400 ''
 ATEX 410 ''
 ATEX 411 ''
 ATEX 298 ''
-
 Tagging ON
 Instname  NAME with balloon off
 Delimiter  COLON
