@@ -71,8 +71,8 @@ Wastage AREA 6 1
 Wastage AREA 7 1
 Wastage AREA 8 1
 Wastage AREA 9 1
-Weldnumbers  OFF
-Weldid OFF
+Weldnumbers Charheight 2.1mm ALL GENERATED BOX
+Weldid ON
 Weldtype  ON
 Underlayplot  "\\10.255.1.9\e3d2.1\ELAPREVAMP\lapiso\und\ELAP-ISO_FRAME-15-06-2025.plt" 1
 SymbolFile "%aveva_design_exe%/iso_symbols\mds-skeys" READONLY
@@ -100,14 +100,16 @@ Compipe MTO DRWG
 Compipe Itemcodes USER
 Compipe Descriptions SHORT
 Compipe Supports ON
-ATEX 222 'SLOPE'
+
+Atext 222 'SLOPE'
 Atext 252 ''
 Atext 255 'THE SAME LINE No. SHEET.'
-ATEX 270 ''                      $* TURN OFF ISPEC IN TITLE BLOCK
-ATEX 271 ''                      $* TURN OFF TRACE IN TITLE BLOCK
-ATEX 272 ''                      $* TURN OFF PAINT IN TITLE BLOCK
-ATEX 278 ''
-ATEX 289 ''                      $* SPEC BREAK
+Atext 270 ''
+Atext 271 ''
+Atext 272 ''
+Atext 278 ''
+Atext 289 ''
+Atext 298 ''
 Atext 301 'PT'
 Atext 302 'NO'
 Atext 303 'COMPONENT DESCRIPTION'
@@ -117,22 +119,23 @@ Atext 306 'QTY'
 Atext 317 ''
 Atext 318 ''
 Atext 330 '(INS)'
-ATEX 339 'SUPPORT COMPONENTS'
-ATEX 346 ''
-ATEX 350 ''
-ATEX 401 ''
-ATEX 402 ''
-ATEX 403 ''
-ATEX 404 ''
-ATEX 405 ''
-ATEX 406 ''
-ATEX 407 ''
-ATEX 400 ''
-ATEX 410 ''
-ATEX 411 ''
-ATEX 298 ''
+Atext 339 'SUPPORT COMPONENTS'
+Atext 346 ''
+Atext 350 ''
+Atext 400 ''
+Atext 401 ''
+Atext 402 ''
+Atext 403 ''
+Atext 404 ''
+Atext 405 ''
+Atext 406 ''
+Atext 407 ''
+Atext 410 ''
+Atext 411 ''
+
 Tagging ON
 Instname  NAME with balloon off
+
 Delimiter  COLON
 InsulationControl  ALL
 TracingControl  ALL
@@ -161,14 +164,10 @@ Coords  ON AT Vent
 Coords  ON AT Dran
 Coords  ON AT Shee
 Coords  ON AT Misc
-
-
-
 Elevation    INTERSECTION
 Skewbox  TRIANGLE NSTD Standout 4mm Hatch 3mm Partial 20mm Tags OFF
 Zerolengthskews OFF
 Fallskews THREEDBOX  ON
-
 TextPosition NORTHA X 0mm Y 0mm CharHeight 2.1mm
 TextPosition NAME X 331mm Y 19.5mm CharHeight 2mm
 TextPosition PSPE X 233mm Y 13mm CharHeight 1.4mm
@@ -180,31 +179,26 @@ Itemcode  Length SHORT
 Tapping Scale  100
 Tapping Dimensions ON
 Tapping Coordinates OFF
-
-
-
-
 Truncate OFF
 Weldangles OFF
 EquipmentNumbering NOZZLE
-OUTCOM NAME ON PCOM WITH ROUND
-OUTCOM NAME ON FILT WITH ROUND
+Outcom NAME on FILT with Boxstyle ROUND
+Outcom NAME on PCOM with Boxstyle ROUND
 Tubesplits ON
 Repeatability OFF
-MTEXT IGNORE
-DTEXT ON
-DTEXT RTEXT
+Mtexts  IGNORE
+Mtexts  XTEXT
+Dtexts  ON
+Dtexts  RTEXT
 Leglength 9mm
 Overallskews ON
 Refdimensions OFF
 BoltFile  OFF
-
-
 WeldTableFile  OFF
 BendTableFile  OFF
 ContNotes PIPE Descriptions  OFF
 ContSheets  ON
-ContWelds  OFF
+ContWelds  ON
 ContJoints  OFF
 JointNumbers  OFF
 PBendNumbers OFF
@@ -215,7 +209,6 @@ PipenameDelimiter Suffix  OFF
 LineThickness 3
 MessageAccuracy RADIAL 1
 MessageAccuracy ITERATIONS 1
-
 PartNoEnclosure STRGTB
 Coformat USER
 Counits MM
@@ -227,9 +220,9 @@ Change Highlighting  OFF
 Change Highlighting Colour 2
 Change Highlighting  Rule  Unset
 DIMALL OFF
-
-
-
+SPINDLEDIR ENU
+PPIECE OFF
+PSNAME OFF
 -- AVEVA - Units serialisation file
 -- --------------------------------
 
