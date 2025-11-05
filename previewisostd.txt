@@ -71,10 +71,10 @@ Wastage AREA 6 1
 Wastage AREA 7 1
 Wastage AREA 8 1
 Wastage AREA 9 1
-Weldnumbers Charheight 2.1mm ALL GENERATED BOX
+Weldnumbers OFF
 Weldid ON
 Weldtype  ON
-Underlayplot  "\\10.255.1.9\e3d2.1\ELAPREVAMP\lapiso\und\ELAP-ISO_FRAME-15-06-2025.plt" 1
+Underlayplot  "\\10.255.1.9\e3d2.1\ELAPREVAMP\lapiso\und\TRIPLE-P-A3-ISO.plt" 1
 SymbolFile "%aveva_design_exe%/iso_symbols\mds-skeys" READONLY
 MessageFile "%AVEVA_DESIGN_USER%\mess" OVERWRITE
 TransferFile  OFF
