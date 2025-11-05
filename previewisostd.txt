@@ -153,6 +153,7 @@ Itemcode Vents DEFAULT
 Itemcode Filters DEFAULT
 Itemcode  TOTAL
 Itemcode  from SPREF
+Itemcode for Supports from SPREF
 Bolting  length description ON
 Bolting  length itemcode APPEND
 Bolting  Units  METIMP
