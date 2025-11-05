@@ -13,8 +13,8 @@ AppWareText 'RENAME' 'ON'
 INCH Bore
 MM Distance
 Precision Bores NOMINAL
-CuttingList  OFF
-Cutmarks  OFF
+CuttingList  ON
+Cutmarks  ON
 Charheight 2.5mm
 HYPERPLANT  OFF
 Date OFF
@@ -45,7 +45,7 @@ Isotype  COMBINED
 !outputfile = !outputfile.Replace('"','')
 !outputfile = !outputfile.Replace('/','_')
 File PDF  "\\10.255.1.9\local\ELAB ISOMETRICS/$!outputfile$n."  SINGLE
-File SET PDF View Nocomp BW Bindpages
+File SET PDF Colourplus Bindpages
 File SET PRINT Nofit Dialog Colourplus Bindpages
 File SET IMAGE PNG Colourplus Bindpages
 File SET EMF Colourplus Bindpages
@@ -71,7 +71,7 @@ Wastage AREA 6 1
 Wastage AREA 7 1
 Wastage AREA 8 1
 Wastage AREA 9 1
-Weldnumbers OFF
+Weldnumbers  OFF
 Weldid ON
 Weldtype  ON
 Underlayplot  "\\10.255.1.9\e3d2.1\ELAPREVAMP\lapiso\und\TRIPLE-P-A3-ISO.plt" 1
@@ -185,7 +185,7 @@ Weldangles OFF
 EquipmentNumbering NOZZLE
 Outcom NAME on FILT with Boxstyle ROUND
 Outcom NAME on PCOM with Boxstyle ROUND
-Tubesplits ON
+Tubesplits OFF
 Repeatability OFF
 Mtexts  IGNORE
 Mtexts  XTEXT
