@@ -28,7 +28,7 @@ Dimensions Hangers ALONGSIDE strings
 Dimlabels IN
  Supports  STRING
 Margin  LEFT 18mm
-Margin  RIGHT 12mm
+Margin  RIGHT 4mm
 Margin  TOP 10mm
 Margin  BOTTOM 56mm
 Size  A3
@@ -91,8 +91,8 @@ MaterialList  Code  12 DUMMY SINGLE
 MaterialList PartNumbers GENERATED
 MaterialList  GRIDLINES ON
 MaterialList TableDefinition Column 1 PARTNUMBER with Width 3
-Column 2 DESCRIPTION with Width 54
-Column 3 BORE with Width 8
+Column 2 DESCRIPTION with Width 59
+Column 3 BORE with Width 9
 Column 4 ITEMCODE with Width 8
 Column 5 QUANTITY in Metres with Width 7
 CompipeFile  OFF
