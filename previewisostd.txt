@@ -182,13 +182,13 @@ VAR !INSULATION Ispec OF PIPE
 !INSULATION = !INSULATION.Replace('/','')
 !INSULATION = !INSULATION.Replace('0/0','')
 !INSULATION = !INSULATION.Replace('_FibreGlass','')
-TextPosition '$!INSULATION$n' X 360mm Y 45mm CharHeight 2mm
+TextPosition '$!INSULATION$n' X 356mm Y 45mm CharHeight 2mm
 
 
 
 VAR !INSULTYPE :INSUL-TYPE OF PIPE
 !INSULTYPE = !INSULTYPE.Replace('unset','')
-TextPosition '$!INSULTYPE' X 330mm Y 45mm CharHeight 2mm
+TextPosition '$!INSULTYPE' X 328mm Y 45mm CharHeight 2mm
 
 
 
@@ -308,70 +308,70 @@ TextPosition '$!REV6DATE6$n' X 152mm Y 41mm CharHeight 1.7mm
 
 
 VAR !REV0EXTRACTBY0 :REV0-EXTRACT-BY OF PIPE
-TextPosition '$!REV0EXTRACTBY0$n' X 171mm Y 14.5mm CharHeight 2mm
+TextPosition '$!REV0EXTRACTBY0$n' X 170.5mm Y 14.5mm CharHeight 2mm
 VAR !REV1EXTRACTBY1 :REV1-EXTRACT-BY OF PIPE
 !REV1EXTRACTBY1 = !REV1EXTRACTBY1.Replace('-','')
-TextPosition '$!REV1EXTRACTBY1$n' X 171mm Y 19mm CharHeight 2mm
+TextPosition '$!REV1EXTRACTBY1$n' X 170.5mm Y 19mm CharHeight 2mm
 VAR !REV2EXTRACTBY2 :REV2-EXTRACT-BY OF PIPE
 !REV2EXTRACTBY2 = !REV2EXTRACTBY2.Replace('-','')
-TextPosition '$!REV2EXTRACTBY2$n' X 171mm Y 23.5mm CharHeight 2mm
+TextPosition '$!REV2EXTRACTBY2$n' X 170.5mm Y 23.5mm CharHeight 2mm
 VAR !REV3EXTRACTBY3 :REV3-EXTRACT-BY OF PIPE
 !REV3EXTRACTBY3 = !REV3EXTRACTBY3.Replace('-','')
-TextPosition '$!REV3EXTRACTBY3$n' X 171mm Y 28mm CharHeight 2mm
+TextPosition '$!REV3EXTRACTBY3$n' X 170.5mm Y 28mm CharHeight 2mm
 VAR !REV4EXTRACTBY4 :REV4-EXTRACT-BY OF PIPE
 !REV4EXTRACTBY4 = !REV4EXTRACTBY4.Replace('-','')
-TextPosition '$!REV4EXTRACTBY4$n' X 171mm Y 32mm CharHeight 2mm
+TextPosition '$!REV4EXTRACTBY4$n' X 170.5mm Y 32mm CharHeight 2mm
 VAR !REV5EXTRACTBY5 :REV5-EXTRACT-BY OF PIPE
 !REV5EXTRACTBY5 = !REV5EXTRACTBY5.Replace('-','')
-TextPosition '$!REV5EXTRACTBY5$n' X 171mm Y 36.5mm CharHeight 2mm
+TextPosition '$!REV5EXTRACTBY5$n' X 170.5mm Y 36.5mm CharHeight 2mm
 VAR !REV6EXTRACTBY6 :REV6-EXTRACT-BY OF PIPE
 !REV6EXTRACTBY6 = !REV6EXTRACTBY6.Replace('-','')
-TextPosition '$!REV6EXTRACTBY6$n' X 171mm Y 41mm CharHeight 2mm
+TextPosition '$!REV6EXTRACTBY6$n' X 170.5mm Y 41mm CharHeight 2mm
 
 
 
 VAR !REV0CHCK0 :REV0-CHCK OF PIPE
-TextPosition '$!REV0CHCK0$n' X 181mm Y 14.5mm CharHeight 2mm
+TextPosition '$!REV0CHCK0$n' X 180.5mm Y 14.5mm CharHeight 2mm
 VAR !REV1CHCK1 :REV1-CHCK OF PIPE
 !REV1CHCK1 = !REV1CHCK1.Replace('-','')
-TextPosition '$!REV1CHCK1$n' X 181mm Y 19mm CharHeight 2mm
+TextPosition '$!REV1CHCK1$n' X 180.5mm Y 19mm CharHeight 2mm
 VAR !REV2CHCK2 :REV2-CHCK OF PIPE
 !REV2CHCK2 = !REV2CHCK2.Replace('-','')
-TextPosition '$!REV2CHCK2$n' X 181mm Y 23.5mm CharHeight 2mm
+TextPosition '$!REV2CHCK2$n' X 180.5mm Y 23.5mm CharHeight 2mm
 VAR !REV3CHCK3 :REV3-CHCK OF PIPE
 !REV3CHCK3 = !REV3CHCK3.Replace('-','')
-TextPosition '$!REV3CHCK3$n' X 181mm Y 28mm CharHeight 2mm
+TextPosition '$!REV3CHCK3$n' X 180.5mm Y 28mm CharHeight 2mm
 VAR !REV4CHCK4 :REV4-CHCK OF PIPE
 !REV4CHCK4 = !REV4CHCK4.Replace('-','')
-TextPosition '$!REV4CHCK4$n' X 181mm Y 32mm CharHeight 2mm
+TextPosition '$!REV4CHCK4$n' X 180.5mm Y 32mm CharHeight 2mm
 VAR !REV5CHCK5 :REV5-CHCK OF PIPE
 !REV5CHCK5 = !REV5CHCK5.Replace('-','')
-TextPosition '$!REV5CHCK5$n' X 181mm Y 36.5mm CharHeight 2mm
+TextPosition '$!REV5CHCK5$n' X 180.5mm Y 36.5mm CharHeight 2mm
 VAR !REV6CHCK6 :REV6-CHCK OF PIPE
 !REV6CHCK6 = !REV6CHCK6.Replace('-','')
-TextPosition '$!REV6CHCK6$n' X 181mm Y 41mm CharHeight 2mm
+TextPosition '$!REV6CHCK6$n' X 180.5mm Y 41mm CharHeight 2mm
 
 
 VAR !REV0APPR0 :REV0-APPR OF PIPE
-TextPosition '$!REV0APPR0$n' X 191mm Y 14.5mm CharHeight 2mm
+TextPosition '$!REV0APPR0$n' X 190mm Y 14.5mm CharHeight 2mm
 VAR !REV1APPR1 :REV1-APPR OF PIPE
 !REV1APPR1 = !REV1APPR1.Replace('-','')
-TextPosition '$!REV1APPR1' X 191mm Y 19mm CharHeight 2mm
+TextPosition '$!REV1APPR1' X 190mm Y 19mm CharHeight 2mm
 VAR !REV2APPR2 :REV2-APPR OF PIPE
 !REV2APPR2 = !REV2APPR2.Replace('-','')
-TextPosition '$!REV2APPR2$n' X 191mm Y 23.5mm CharHeight 2mm
+TextPosition '$!REV2APPR2$n' X 190mm Y 23.5mm CharHeight 2mm
 VAR !REV3APPR3 :REV3-APPR OF PIPE
 !REV3APPR3 = !REV3APPR3.Replace('-','')
-TextPosition '$!REV3APPR3$n' X 191mm Y 28mm CharHeight 2mm
+TextPosition '$!REV3APPR3$n' X 190mm Y 28mm CharHeight 2mm
 VAR !REV4APPR4 :REV4-APPR OF PIPE
 !REV4APPR4 = !REV4APPR4.Replace('-','')
-TextPosition '$!REV4APPR4$n' X 191mm Y 32mm CharHeight 2mm
+TextPosition '$!REV4APPR4$n' X 190mm Y 32mm CharHeight 2mm
 VAR !REV5APPR5 :REV5-APPR OF PIPE
 !REV5APPR5 = !REV5APPR5.Replace('-','')
-TextPosition '$!REV5APPR5' X 191mm Y 36.5mm CharHeight 2mm
+TextPosition '$!REV5APPR5' X 190mm Y 36.5mm CharHeight 2mm
 VAR !REV6APPR6 :REV6-APPR OF PIPE
 !REV6APPR6 = !REV6APPR6.Replace('-','')
-TextPosition '$!REV6APPR6' X 191mm Y 41mm CharHeight 2mm
+TextPosition '$!REV6APPR6' X 190mm Y 41mm CharHeight 2mm
 
 
 
