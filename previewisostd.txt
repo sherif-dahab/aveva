@@ -91,10 +91,10 @@ MaterialList  Code  12 DUMMY SINGLE
 MaterialList PartNumbers GENERATED
 MaterialList  GRIDLINES ON
 MaterialList TableDefinition Column 1 PARTNUMBER with Width 3
-Column 2 DESCRIPTION with Width 55
+Column 2 DESCRIPTION with Width 54
 Column 3 BORE with Width 7
 Column 4 ITEMCODE with Width 8
-Column 5 QUANTITY in Metres with Width 5
+Column 5 QUANTITY in Metres with Width 6
 CompipeFile  OFF
 Compipe MTO DRWG
 Compipe Itemcodes USER
@@ -170,7 +170,7 @@ Skewbox  TRIANGLE NSTD Standout 4mm Hatch 3mm Partial 20mm Tags OFF
 Zerolengthskews OFF
 Fallskews THREEDBOX  ON
 TextPosition NORTHA X 0mm Y 0mm CharHeight 2.1mm
-TextPosition NAME X 360mm Y 21mm CharHeight 2.5mm
+TextPosition NAME X 353mm Y 21mm CharHeight 2.5mm
 TextPosition PSPE X 0mm Y 0mm CharHeight 1.4mm
 TextPosition REV X 401mm Y 12mm CharHeight 2.5mm
 TextPosition SHEETN X 385mm Y 12mm CharHeight 2mm
