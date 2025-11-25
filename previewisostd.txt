@@ -101,6 +101,7 @@ Compipe Itemcodes USER
 Compipe Descriptions SHORT
 Compipe Supports ON
 
+Atext 221 'GOLDEN JOINT'
 Atext 222 'SLOPE'
 Atext 252 ''
 Atext 255 'THE SAME LINE No. SHEET.'
@@ -120,6 +121,7 @@ Atext 310 'FIELD MATERIALS'
 Atext 317 ''
 Atext 318 ''
 Atext 324 ''
+Atext 328 ''
 Atext 330 '(INS)'
 Atext 339 'SUPPORT COMPONENTS'
 Atext 346 ''
