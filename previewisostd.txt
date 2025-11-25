@@ -71,7 +71,7 @@ Wastage AREA 6 1
 Wastage AREA 7 1
 Wastage AREA 8 1
 Wastage AREA 9 1
-Weldnumbers Charheight 2.1mm ALL FROMDB AWELDS ELLIPSE
+Weldnumbers Charheight 2.1mm ALL FROMDB AWELDS OFF
 Weldid ON
 Weldtype  ON
 Underlayplot  "\\10.255.1.9\e3d2.1\ELAPREVAMP\lapiso\und\TRIPLE-P-A3-ISO.plt" 1
@@ -388,12 +388,10 @@ VAR !GALVPIPE :GALV-PIPE OF PIPE
 !GALVPIPE = !GALVPIPE.Replace('unset','')
 TextPosition '$!GALVPIPE$n' X 18mm Y 53mm CharHeight 2.4mm
 TextPosition DetailPlots Corner TL  X 250mm Y 270mm CharHeight 3.18mm Direction  RIGHT Stack 10 Direction  DOWN  Scale 15
-TextPosition WeldTable Corner TL  X 100mm Y 100mm CharHeight 2mm
-  Column 1 Heading 'NO' Fill WLDP Width 10
-  Column 2 Heading 'SHOP / FIELD' Fill SHOP Width 12
-  Column 3 Heading 'BORE' Fill ABOR Width 10
-
-
+TextPosition WeldTable SortBy WLDP FORWARDS Corner BL  X 11.5mm Y 9.5mm CharHeight 2.1mm
+  Column 1 Heading 'NO' Fill WLDP Width 3
+  Column 2 Heading 'TYPE' Fill STYP Width 6
+  Column 3 Heading 'BORE' Fill ABOR Width 6
 Bendradius DISTANCE
 Itemcode  Length SHORT
 Tapping Scale  100
