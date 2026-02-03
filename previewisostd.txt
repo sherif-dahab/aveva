@@ -15,7 +15,7 @@ MM Distance
 Precision Bores NOMINAL
 CuttingList  ON PERDRAWING OFF ITEMCODES OFF ENDPREPARATIONS OFF
 Cutmarks  ON
-Charheight 2.5mm
+Charheight 2mm
 HYPERPLANT  OFF
 Date OFF
 Dimdistance String 11mm
@@ -60,7 +60,7 @@ PlottingScale  100
 PictureScale  100
 Stacking  1  ALONG
 Split  160  PERCENT
-SpoolNumbers  OFF
+SpoolNumbers  ON
 ISO  3
 Wastage AREA 1 1
 Wastage AREA 2 1
@@ -124,7 +124,6 @@ Atext 324 ''
 Atext 328 ''
 Atext 330 '(INS)'
 Atext 339 'SUPPORT COMPONENTS'
-Atext 346 ''
 Atext 350 ''
 Atext 400 ''
 Atext 401 ''
@@ -201,6 +200,11 @@ VAR !TRACINGTYPE Tspec OF PIPE
 !TRACINGTYPE = !TRACINGTYPE.Replace('=0/0','')
 !TRACINGTYPE = !TRACINGTYPE.Replace('/','')
 TextPosition '$!TRACINGTYPE' X 390mm Y 39mm CharHeight 2mm
+
+
+VAR !PAINTINGSYS :PAINTING-SYS OF PIPE
+!PAINTINGSYS = !PAINTINGSYS.Replace('unset','')
+TextPosition '$!PAINTINGSYS' X 304mm Y 41mm CharHeight 2mm
 
 
 
