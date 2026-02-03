@@ -60,7 +60,7 @@ PlottingScale  100
 PictureScale  100
 Stacking  1  ALONG
 Split  160  PERCENT
-SpoolNumbers  ON
+SpoolNumbers  Prefix 'SPOOL' 
 ISO  3
 Wastage AREA 1 1
 Wastage AREA 2 1
