@@ -207,6 +207,12 @@ VAR !PAINTINGSYS :PAINTING-SYS OF PIPE
 TextPosition '$!PAINTINGSYS' X 304mm Y 41mm CharHeight 2mm
 
 
+VAR !RTNDT :NDT OF PIPE
+!RTNDT = !RTNDT.Replace('unset','')
+TextPosition 'RT.' X 240mm Y 21.5mm CharHeight 2mm
+!RTNDT = !RTNDT.Replace('-','')
+TextPosition '$!RTNDT' X 245mm Y 21.5mm CharHeight 2mm
+
 
 VAR !DESTEMP :DES-TEMP OF PIPE
 !DESTEMP = !DESTEMP.Replace('unset','')
