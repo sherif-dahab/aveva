@@ -539,7 +539,7 @@ EndMethod
 ------------------------------------------------------------------------------------------------------------------------------------------------
 define method .Export(  )
 	-- السطر ده هو اللي كان فيه المشكلة، تم إصلاحه بحصر النصوص داخل | |
-	!!folderName = !!Alert.Input(|Enter Folder Path:|, |G:\PCF\|)
+	!!folderName = !!Alert.Input(|Enter Folder Path:|, |C:\|)
 
 	if !!folderName.unset() or !!folderName eq || then
 		!!Alert.Warning(|Folder not selected!|)
