@@ -538,57 +538,64 @@ EndMethod
 ------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------
 define method .Export(  )
-	import 'PMLFileBrowser'
-	handle any
-	endhandle
-	using namespace 'Aveva.Pdms.Presentation'
-	!fol = object PMLFolderBrowser()
-	!fol.selectedPath('C:\')
-	!fol.Show('Select folder to save', true)
-	!!folderName = !fol.selectedPath() & '\'
-	if !!folderName eq '\' then
+	-- السطر ده هو اللي كان فيه المشكلة، تم إصلاحه بحصر النصوص داخل | |
+	!!folderName = !!Alert.Input(|Enter Folder Path:|, |G:\PCF\|)
+
+	if !!folderName.unset() or !!folderName eq || then
 		!!Alert.Warning(|Folder not selected!|)
 		return
 	endif
-	!!namePCF = !!Alert.Input('Enter the NAME OF PCF FILE if you want to combine into single file!
-	
-	Press ''OK'' if you want to keep saparate files','')
-    !save = !!ce.fullname
+
+	-- توحيد الـ Slashes
+	!!folderName = !!folderName.Replace(|/|, |\|)
+
+	-- التأكد إن المسار ينتهي بـ \
+	if !!folderName.Substring(!!folderName.Length(), 1) neq |\| then
+		!!folderName = !!folderName & |\|
+	endif
+
+	!!namePCF = !!Alert.Input(|Enter the NAME OF PCF FILE if you want to combine into single file! Press OK if you want to keep separate files|, ||)
+
+	!save = !!ce.fullname
+
 	if !this.lstPipList.count eq 0 then
 		!!Alert.Warning(|Please Add Pipes.|)
 		return
 	endif
+
 	!pipes = !this.lstPipList.selection()
 	if !pipes.size() EQ 0 then
 		!!Alert.Warning(|Please select Pipes.|)
 		return
 	endif
-	--!!folderName = '%pdmswk%\CaesarPCF\'
-    !folder = object file(!!folderName)
-    if(!folder.exists() eq false)then
-        --syscom 'MD %pdmswk%\CaesarPCF\'
-		syscom 'MD $!!folderName'
-    endif
-    --syscom 'del %pdmswk%\CaesarPCF\ /q'
-	--syscom 'del $!!folderName /q'
+
+	!folder = object file(!!folderName)
+	if (!folder.exists() eq false) then
+		syscom |MD "$!{!!folderName}"|
+	endif
+
 	!!lines.clear()
-	!!lines.append('ISOGEN-FILES            ISOGEN.FLS   ')
-	!!lines.append('UNITS-BORE              INCH         ')
-	!!lines.append('UNITS-CO-ORDS           MM           ')
-	!!lines.append('UNITS-BOLT-LENGTH       MM           ')
-	!!lines.append('UNITS-BOLT-DIA          INCH         ')
-	!!lines.append('UNITS-WEIGHT            KGS          ')
+	!!lines.append(|ISOGEN-FILES            ISOGEN.FLS   |)
+	!!lines.append(|UNITS-BORE              INCH         |)
+	!!lines.append(|UNITS-CO-ORDS           MM           |)
+	!!lines.append(|UNITS-BOLT-LENGTH       MM           |)
+	!!lines.append(|UNITS-BOLT-DIA          INCH         |)
+	!!lines.append(|UNITS-WEIGHT            KGS          |)
+
 	do !pip values !pipes
 		$!pip
 		!this.Xuat()
 	enddo
-	if(!!namePCF neq '') then
-		!pcfFileName = !!folderName + !!namePCF.Replace('"','').Replace('*','').Replace('\','').Replace('/','').Replace('|','').Replace('?','').Replace(':','').Replace('<','').Replace('>','') + '.pcf'
+
+	if (!!namePCF neq ||) then
+		!safeName = !!namePCF.Replace('"','').Replace('*','').Replace('\','').Replace('/','').Replace('|','').Replace('?','').Replace(':','').Replace('<','').Replace('>','')
+		!pcfFileName = !!folderName & !safeName & |.pcf|
 		!file = object file(!pcfFileName)
-		!file.WriteFile('OVERWRITE', !!lines)
+		!file.WriteFile(|OVERWRITE|, !!lines)
 	endif
+
 	$!save
-	!!Alert.Message('Export PCF File Successfully.')
+	!!Alert.Message(|Export PCF File Successfully.|)
 endmethod
 ------------------------------------------------------------------------
 define method .Xuat()

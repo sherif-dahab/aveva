@@ -1,0 +1,183 @@
+------------------------------------------------------------------------
+--
+--
+-- File:            isobatch.pmlfrm
+-- Type:            Form Definition
+--
+-- Author:          ---
+-- Created:         ---
+-- Modified:        ---
+--
+--
+-- Description:
+-- Produces Batch Iso extraction in Design Module.
+--show !!sbatchiso
+------------------------------------------------------------------------
+
+setup form !!sbatchiso dialog docking size 20 20
+	!!sbatchiso.formTitle = |Batch ISO Extraction|
+	
+    -- Body of form definition
+    Para .batiso at X13 ymin + 0.5 text |Batch ISO Extraction App| Width 17
+	
+	Para .paralinelist at x0 ymax + 1 text |Select Line List| width 10
+	button .btnBrowse at xmax + 1 ymin |Browse| callback |!!FILEBROWSER('c:\temp','*','Select Line List',TRUE,'!!sbatchiso.AddList()')|
+	
+	list .lstPipList |PIPE List|	anchor T+L	at x0  ymax+0.5 callback '!this.navigate()' single zeroSelection width 20 lines 8
+    button.AddCE 	at xmax + 0.5 ymin + 1  LINKLABEL   |Add CE|  TOOLTIP 'Add Current Element'         callback |!This.AddCe()|
+    button.AddCeMem at xmin ymin + 1   		LINKLABEL   |CE Mem|  TOOLTIP 'Add Current Element Members' callback |!This.AddCeMembers()|
+    button.RemCE 	at xmin ymin + 1      	LINKLABEL   |Rem CE|  TOOLTIP 'Removes Selected Element'    callback |!This.RemoveSelected()|
+    button.RemAll 	at xmin ymin + 1     	LINKLABEL   |Rem All| TOOLTIP 'Clear All'                   callback |!this.ClearList()|
+	
+	list .lstIsoOptList |ISO Option List|	anchor T+L	at x0  ymax.lstPipList + 1 single zeroSelection width 20 lines 8
+	
+	button.btnGenerate 	at x3 ymax + 1     	|Generate| TOOLTIP 'Generates Iso for all Pipes in List' callback |!this.generateIso()|
+	button.btnDismiss 	at xmax + 5 ymin 	|Dismiss| TOOLTIP 'Dismiss the Form' callback |KILL !!sbatchiso|
+exit
+
+define method .sbatchiso()
+	$* Get info from the project iso dir
+	var !proj project code
+	!isocode = !proj & 'iso'
+	var !optionFileDir evar $!isocode
+	!optFilesDir = object file('$!optionFileDir/std')
+	!optfiles = !optFilesDir.files()
+	!optFileNames = ARRAY()
+	do !optFil values !optfiles
+		!optFileNames.append(!optFil.entry())
+	enddo
+	!This.lstIsoOptList.dtext = !optFileNames
+
+EndMethod
+-----------------------------------------------------------------------
+define method .generateIso()
+	GETWORK
+
+	if !this.lstPipList.count eq 0 then
+		!!Alert.Warning(|Please Add Pipes.|)
+		return
+	endif
+	
+	if !this.lstIsoOptList.count eq 0 then
+		!!Alert.Warning(|ISO Option file not available. contact Admin|)
+		return
+	endif
+	
+	if !this.lstIsoOptList.val eq 0 then
+		!!Alert.Warning(|Select the ISO Option file.|)
+		return
+	endif
+	
+	!pipes = !this.lstPipList.dtext
+	!selFile = !this.lstIsoOptList.selection()
+	var !proj project code
+	!isocode = !proj & 'iso'
+	var !optionFileDir evar $!isocode
+	!optionFile = !optionFileDir & '/std/' & !selFile
+
+	ISODRAFTMODE
+	handle any
+	endhandle
+
+	!failedLines = array()
+	do !pip values !pipes
+		$!pip
+		$m $!optionFile
+		detail $!pip
+		handle any
+			--$p ISO extraction failed for $!pip
+			!failedLines.append(!pip)
+			skip
+		endhandle
+	enddo
+
+	EXIT	$* Exiting from ISODRAFTMODE
+	
+	--alp req clear
+	$p ISO extraction failed for the below Lines.
+	q var !failedLines
+	
+	if !selFile eq 'TVM_STRESS' then
+		pml load form !!caesariipcf
+		!!caesariipcf.list.Clear()
+		!!caesariipcf.list.dtext = !!sbatchiso.lstPipList.dtext
+		!!caesariipcf.Export()
+		!!Alert.Message('ISO Exctraction Completed & PCF files Generated Successfully.')
+		return
+	endif
+    
+	
+	!!Alert.Message('ISO Exctraction Completed Successfully.')
+EndMethod
+-----------------------------------------------------------------------
+-- To read File and add the Lines to List.
+Define Method .AddList()
+	!FilNam = !!fileBrowser.file.string()
+
+	!Fil = OBJECT FILE(!FilNam)
+	!FileArr = !Fil.ReadFile()
+
+	!PipeArr = object array()
+	do !line values !FileArr
+		if !line.substring(1,1) NEQ '/' and !line.substring(1,1) NEQ '=' then
+			!line = '/' & !line
+		endif
+		!PipeArr.APPEND(!line)
+	enddo
+
+  !This.lstPipList.dtext = !PipeArr.unique()
+EndMethod
+-----------------------------------------------------------------------
+Define Method .navigate()
+	!mem = !this.lstPipList.selection()
+	$!mem
+EndMethod
+-----------------------------------------------------------------------
+
+Define Method .AddCeMembers()
+    !MemList = !This.lstPipList.dtext
+
+    if !!ce.Type NEQ 'ZONE' then
+        !!Alert.Message(!!ce.Type & ' is Invalid Element. Valid Element Type ZONE.')
+        return
+    endif
+
+    do !inx from 1 to !!ce.mcount()
+		skip if(!!ce.mem[!inx].type neq 'PIPE')
+         !MemList.append(!!ce.mem[!inx].name)
+    enddo
+
+   !This.lstPipList.dtext = !MemList.unique()
+EndMethod
+
+-----------------------------------------------------------------------
+
+Define Method .AddCe()
+	!MemList = !This.lstPipList.dtext
+
+	if (!!CE.Type neq 'PIPE') then
+		!!Alert.Warning(!!ce.Type & ' is invalid element. Valid element Type is PIPE.')
+		return
+	endif
+
+	!MemList.append(!!CE.Name)
+	!This.lstPipList.dtext =  !MemList.unique()
+EndMethod
+
+-----------------------------------------------------------------------
+
+Define Method .RemoveSelected()
+    if(!This.lstPipList.dtext.unset() and !This.lstPipList.dtext.empty())then
+        return
+    endif
+
+    !MemName = !This.lstPipList.dtext 
+    !MemName.deletefrom(!This.lstPipList.val,1)
+    !This.lstPipList.dtext = !MemName.COMPRESS()
+EndMethod
+
+-----------------------------------------------------------------------
+
+Define Method .ClearList()
+    !this.lstPipList.clear()
+EndMethod
