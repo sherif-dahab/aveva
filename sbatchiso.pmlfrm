@@ -1,28 +1,12 @@
 ------------------------------------------------------------------------
---
---
--- File:            isobatch.pmlfrm
--- Type:            Form Definition
---
--- Author:          ---
--- Created:         ---
--- Modified:        ---
---
---
--- Description:
--- Produces Batch Iso extraction in Design Module.
---show !!sbatchiso
+-- FIXED V4 - قراءة SupAllAncis بدون .size() (اللي كان بيرجع error)
+-- بنجرب نقرا العناصر واحد واحد لحد ما يخلصوا 1..50
 ------------------------------------------------------------------------
 setup form !!sbatchiso dialog docking size 20 20
 	!!sbatchiso.formTitle = |Batch ISO Extraction|
-	
-    -- Body of form definition
     Para .batiso at X13 ymin + 0.5 text |Batch ISO Extraction App| Width 17
-	
 	Para .paralinelist at x0 ymax + 1 text |Select Line List| width 10
 	button .btnBrowse at xmax + 1 ymin |Browse| callback |!!FILEBROWSER('c:\temp','*','Select Line List',TRUE,'!!sbatchiso.AddList()')|
-	
-	--list .lstPipList |PIPE List|	anchor T+L	at x0  ymax+0.5 callback '!this.navigate()' single zeroSelection width 20 lines 8
 	list .lstPipList |PIPE List|	anchor T+L	at x0  ymax+0.5 callback '!this.navigate()' MULTIPLE width 20 lines 8
     $(
 	button.AddCE 		at xmax + 0.5 ymin + 1  LINKLABEL   |Add CE|	TOOLTIP 'Add Current Element'         callback |!This.AddCe()|
@@ -37,12 +21,7 @@ setup form !!sbatchiso dialog docking size 20 20
     button.RemAll 		at xmin ymin + 1     	|Rem All|	TOOLTIP 'Clear All'                   callback |!this.ClearList()|
 	button.CheckIso 	at xmin ymin + 1     	|Check Iso|	TOOLTIP 'Check Iso'       			  callback |!this.CheckIso()|
 	button.export 		at xmin ymin + 1     	|Export PCF|	TOOLTIP 'Export PCF'					  callback |!this.Export()|
-	
 	list .lstIsoOptList |ISO Option List|	anchor T+L	at x0  ymax.lstPipList + 1 single zeroSelection width 20 lines 8
-	--button .btnPCF at x0  ymax.lstIsoOptList + 0.1 |PCF| callback |!!FILEBROWSER('c:\temp','*','Select Line List',TRUE,'!!sbatchiso.AddList()')|
-	--text .PCFFile ':' at xmax  ymax.lstIsoOptList + 0.1 width 22 scroll 100 is STRING
-	--!this.PCFFile.val = 'D:\'
-	
 	button.btnGenerate 	at x3 ymax + 1     	|Generate| TOOLTIP 'Generates Iso for all Pipes in List' callback |!this.generateIso()|
 	button.btnDismiss 	at xmax + 5 ymin 	|Dismiss| TOOLTIP 'Dismiss the Form' callback |KILL !!sbatchiso|
 	!!mangten = Array()
@@ -66,7 +45,6 @@ setup form !!sbatchiso dialog docking size 20 20
 exit
 
 define method .sbatchiso()
-	$* Get info from the project iso dir
 	var !proj project code
 	!isocode = !proj & 'iso'
 	var !optionFileDir evar $!isocode
@@ -77,46 +55,35 @@ define method .sbatchiso()
 		!optFileNames.append(!optFil.entry())
 	enddo
 	!This.lstIsoOptList.dtext = !optFileNames
------------------------------------------------------------------------
-    $* format for bore
     !boreFormat  = object format()
     !boreFormat.dp = 6
     !boreFormat.units = 'INCH'
-    $* format for position
     !positionFormat = object format()
     !positionFormat.dp = 6
     !positionFormat.Dimension = 'L'
     !positionFormat.units = 'MM'
-    $* format for angle
     !angleFormat  = object format()
     !angleFormat.dp = 0
     !angleFormat.Dimension = 'L'
-    -- !angleFormat.units = 'degree'
-    -- !angleFormat.units = 'MM'
-	
     !this.boreFormat = !boreFormat
     !this.positionFormat = !positionFormat
     !this.angleFormat = !angleFormat
 EndMethod
------------------------------------------------------------------------
+
 define method .generateIso()
 	GETWORK
-
 	if !this.lstPipList.count eq 0 then
 		!!Alert.Warning(|Please Add Pipes.|)
 		return
 	endif
-	
 	if !this.lstIsoOptList.count eq 0 then
 		!!Alert.Warning(|ISO Option file not available. contact Admin|)
 		return
 	endif
-	
 	if !this.lstIsoOptList.val eq 0 then
 		!!Alert.Warning(|Select the ISO Option file.|)
 		return
 	endif
-	
 	!pipes = !this.lstPipList.selection()
 	if !pipes.size() EQ 0 then
 		!!Alert.Warning(|Please select Pipes.|)
@@ -127,7 +94,6 @@ define method .generateIso()
 	!isocode = !proj & 'iso'
 	var !optionFileDir evar $!isocode
 	!optionFile = !optionFileDir & '/std/' & !selFile
-	
 	!tepx= object file(!optionFile)
 	!file1 = object FILE('%PDMSUSER%' & '\STD\previewisostd.txt')
 	if (!file1.exists().not()) then
@@ -142,12 +108,6 @@ define method .generateIso()
 	!tenfile1= !xxx & '-xxx-old'
 	!file1.move(!tenfile1)
 	!tepx.copy(!xxx)
-
-	
-	
-	
-	--!fileISO = object FILE('%PDMSUSER%' & '\STD\previewisostd.txt')
-	
 	!dongthu= 0
 	!!donglenh= ''
 	!fileObj = OBJECT FILE(!optionFile)
@@ -167,14 +127,6 @@ define method .generateIso()
 	!!donglenh= !!donglenh.Replace('\\','\')
 	!!tenchung= !resultArray[2].Replace('/','\')
 	!!tenchung= !!tenchung.Replace('\\','\')
-	--!!donglenh= 'D:\'
-	--!!tenchung= 'D:\plot'
-	--!resultArray = !!donglenh.Split('\')
-	--!!donglenh= !resultArray[1] & '\'
-	--!sopt = !resultArray.Size() - 1
-	--do !x from 2 to !sopt
-	--	!!donglenh= !!donglenh & !resultArray[!x] & '\'
-	--enddo
 	!folderlog = !!tenchung.Split('\')
 	!tenfolderlog= !folderlog[1] & '\'
 	!sopt = !folderlog.Size() - 1
@@ -182,34 +134,23 @@ define method .generateIso()
 		!tenfolderlog= !tenfolderlog & !folderlog[!x] & '\'
 	enddo
 	!tenfilelog= !tenfolderlog & 'log.txt'
-	--!filelog = object FILE(!this.LogFile.val)
 	!filelog = object FILE(!tenfilelog)
 	!filelog.Open('OVERWRITE')
 	if (!filelog.exists().not()) then
-		--!this.LogFile.val= 'D:\log.txt'
 		!filelog = object FILE('D:\log.txt')
 		!filelog.Open('OVERWRITE')
-		--!filelog.directory()
 	endif
-	
-	
 	ISODRAFTMODE
 	handle any
 	endhandle
-
 	!failedLines = array()
 	!kqpip= array()
 	!kqso= array()
 	!sopip= 0
 	do !pip values !pipes
 		!sopip= !sopip + 1
-		--!!tenfile1= ''
-		--!!tenfile2= ''
 		$!pip
-		
-		--!tenpip = !!ce.type + ' ' + !pip.After('/').Replace('"','').Replace('*','').Replace('\','').Replace('/','').Replace('|','').Replace('?','').Replace(':','').Replace('<','').Replace('>','')
 		!tenpip = '/' + !pip.After('/').Replace('"','').Replace('*','').Replace('\','').Replace('/','').Replace('|','').Replace('?','').Replace(':','').Replace('<','').Replace('>','')
-		
 		!!ten0 = !!donglenh + !tenpip
 		if !tenpip.length() LT 50 then
 			!tenpip= !tenpip + !!space[50 - !tenpip.length()]
@@ -217,27 +158,12 @@ define method .generateIso()
 		!kqpip.append(!tenpip)
 		!so0 = 0
 		!kqso.append(!so0)
-		
 		$m $!optionFile
 		detail $!pip
 		handle any
-			--$p ISO extraction failed for $!pip
 			!failedLines.append(!pip)
 			skip
 		endhandle
-		$(---------------------------------------------------------------------------------
-		if !!tenfile1 NEQ '' and !!tenfile2 NEQ '' and !!mangten[1] NEQ '' then
-			!tep= object file(!!tenfile1)
-			if !tep.EXISTS() then
-				!tep.move(!!tencuoi1)
-			endif
-			!tep= object file(!!tenfile2)
-			if !tep.EXISTS() then
-				!tep.move(!!tencuoi2)
-			endif
-		endif
-		$)
-		-----------------------------------------------------------------------------------
 		Do !var value !!mangten
 			!tentep= !!tenchung & !var
 			!tep= object file(!tentep)
@@ -258,8 +184,7 @@ define method .generateIso()
 			endif
 		Enddo
 	enddo
-
-	EXIT	$* Exiting from ISODRAFTMODE
+	EXIT
 	!!isdRunIso('STA', true)
 	Do !var value !!mangten
 		!tentep= !!tenchung & !var
@@ -277,16 +202,12 @@ define method .generateIso()
 			Break
 		endif
 	Enddo
-	
 	!file1 = object FILE(!xxx)
 	!file1.deletefile()
 	!file1= object FILE(!tenfile1)
 	!file1.move(!xxx)
-	
-	--alp req clear
 	$p ISO extraction failed for the below Lines.
 	q var !failedLines
-	
 	if !selFile eq 'TVM_STRESS' then
 		pml load form !!caesariipcf
 		!!caesariipcf.list.Clear()
@@ -295,7 +216,6 @@ define method .generateIso()
 		!!Alert.Message('ISO Exctraction Completed & PCF files Generated Successfully.')
 		return
 	endif
-	
 	if !filelog.exists() then
 		do !x from 1 to !sopip
 			if !kqso[!x] EQ 0 then
@@ -306,18 +226,12 @@ define method .generateIso()
 		enddo
 	endif
 	!filelog.close()
-	
 	!!Alert.Message('ISO Exctraction Completed Successfully.
 	Folder is: ''$!tenfolderlog''')
 EndMethod
+
 define method .CheckIso()
 	GETWORK
-	
-	--if !this.lstPipList.val eq 0 then
-	--	!!Alert.Warning(|Select Pipe.|)
-	--	return
-	--endif
-	
 	!pipes = !this.lstPipList.selection()
 	if !pipes.size() EQ 0 then
 		!!Alert.Warning(|Please select Pipes.|)
@@ -327,7 +241,6 @@ define method .CheckIso()
 		!!Alert.Warning(|Select the ISO Option file.|)
 		return
 	endif
-	
 	!selFile = !this.lstIsoOptList.selection()
 	var !proj project code
 	!isocode = !proj & 'iso'
@@ -347,56 +260,17 @@ define method .CheckIso()
 	!tenfile1= !xxx & '-xxx-old'
 	!file1.move(!tenfile1)
 	!tepx.copy(!xxx)
-	
 	ISODRAFTMODE
 	handle any
 	endhandle
-
 	!failedLines = array()
-
 	!pip = !this.lstPipList.selection()[1]
 	$!pip
-	
-	$(
-	!selFile = 'TEST'
-	var !proj project code
-	!isocode = !proj & 'iso'
-	var !optionFileDir evar $!isocode
-	!optionFile = !optionFileDir & '/std/' & !selFile
-	
-	$m $!optionFile
-	detail $!pip
-	handle any
-		--$p ISO extraction failed for $!pip
-		!failedLines.append(!pip)
-		skip
-	endhandle
-	Do !var value !!mangten
-		!tentep= !!tenchung & !var
-		!tep= object file(!tentep)
-		if !tep.EXISTS() then
-			!tenmoi= !!ten0 & '-Sh' & !var
-			!tep.move(!tenmoi)
-		else
-			Break
-		endif
-		!tentep= !!tenchung & !var & '.dxf'
-		!tep= object file(!tentep)
-		if !tep.EXISTS() then
-			!tenmoi= !!ten0 & '-Sh' & !var & '.dxf'
-			!tep.move(!tenmoi)
-		else
-			Break
-		endif
-	Enddo
-	$)
-	
-	EXIT	$* Exiting from ISODRAFTMODE
+	EXIT
 	!file1 = object FILE(!xxx)
 	!file1.deletefile()
 	!file1= object FILE(!tenfile1)
 	!file1.move(!xxx)
-	
 	!dongthu= 0
 	!!donglenh= ''
 	!fileObj = OBJECT FILE(!optionFile)
@@ -414,7 +288,6 @@ define method .CheckIso()
 	!resultArray = !!donglenh.Split('"')
 	!!tenchung= !resultArray[2].Replace('/','\')
 	!!tenchung= !!tenchung.Replace('\\','\')
-	--!!tenchung= 'D:\plot'
 	!!isdRunIso('STA', true)
 	Do !var value !!mangten
 		!tentep= !!tenchung & !var
@@ -432,32 +305,12 @@ define method .CheckIso()
 			Break
 		endif
 	Enddo
-	
-	$(
-	--alp req clear
-	$p ISO extraction failed for the below Lines.
-	q var !failedLines
-	
-	if !selFile eq 'TVM_STRESS' then
-		pml load form !!caesariipcf
-		!!caesariipcf.list.Clear()
-		!!caesariipcf.list.dtext = !!sbatchiso.lstPipList.dtext
-		!!caesariipcf.Export()
-		!!Alert.Message('ISO Exctraction Completed & PCF files Generated Successfully.')
-		return
-	endif
-	
-	!!Alert.Message('ISO Exctraction Completed Successfully.')
-	$)
 EndMethod
------------------------------------------------------------------------
--- To read File and add the Lines to List.
+
 Define Method .AddList()
 	!FilNam = !!fileBrowser.file.string()
-
 	!Fil = OBJECT FILE(!FilNam)
 	!FileArr = !Fil.ReadFile()
-
 	!PipeArr = object array()
 	do !line values !FileArr
 		if !line.substring(1,1) NEQ '/' and !line.substring(1,1) NEQ '=' then
@@ -465,49 +318,38 @@ Define Method .AddList()
 		endif
 		!PipeArr.APPEND(!line)
 	enddo
-
   !This.lstPipList.dtext = !PipeArr.unique()
 EndMethod
------------------------------------------------------------------------
+
 Define Method .navigate()
 	!mem = !this.lstPipList.selection()
 	if !mem.size() NEQ 0 then
 		$!mem[1]
 	endif
 EndMethod
------------------------------------------------------------------------
 
 Define Method .AddCeMembers()
     !MemList = !This.lstPipList.dtext
-
     if !!ce.Type NEQ 'ZONE' then
         !!Alert.Message(!!ce.Type & ' is Invalid Element. Valid Element Type ZONE.')
         return
     endif
-
     do !inx from 1 to !!ce.mcount()
 		skip if(!!ce.mem[!inx].type neq 'PIPE')
          !MemList.append(!!ce.mem[!inx].name)
     enddo
-
    !This.lstPipList.dtext = !MemList.unique()
 EndMethod
 
------------------------------------------------------------------------
-
 Define Method .AddCe()
 	!MemList = !This.lstPipList.dtext
-
 	if (!!CE.Type neq 'PIPE') then
 		!!Alert.Warning(!!ce.Type & ' is invalid element. Valid element Type is PIPE.')
 		return
 	endif
-
 	!MemList.append(!!CE.Name)
 	!This.lstPipList.dtext =  !MemList.unique()
 EndMethod
-
------------------------------------------------------------------------
 
 Define Method .RemoveSelected()
     if(!This.lstPipList.dtext.unset() and !This.lstPipList.dtext.empty())then
@@ -518,62 +360,41 @@ Define Method .RemoveSelected()
 		!!Alert.Warning(|Please select Pipes.|)
 		return
 	endif
-	
 	!pip1 = !this.lstPipList.selection()[1]
     !MemName = !This.lstPipList.dtext
 	!MemName.deletefrom(!MemName.FindFirst(!pip1),1)
     !This.lstPipList.dtext = !MemName.COMPRESS()
 EndMethod
 
------------------------------------------------------------------------
-
 Define Method .ClearList()
     !this.lstPipList.clear()
 EndMethod
-------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------
-define method .Export(  )
-	-- السطر ده هو اللي كان فيه المشكلة، تم إصلاحه بحصر النصوص داخل | |
-	!!folderName = !!Alert.Input(|Enter Folder Path:|, |C:\|)
 
+define method .Export(  )
+	!!folderName = !!Alert.Input(|Enter Folder Path:|, |G:\PCF\|)
 	if !!folderName.unset() or !!folderName eq || then
 		!!Alert.Warning(|Folder not selected!|)
 		return
 	endif
-
-	-- توحيد الـ Slashes
 	!!folderName = !!folderName.Replace(|/|, |\|)
-
-	-- التأكد إن المسار ينتهي بـ \
 	if !!folderName.Substring(!!folderName.Length(), 1) neq |\| then
 		!!folderName = !!folderName & |\|
 	endif
-
 	!!namePCF = !!Alert.Input(|Enter the NAME OF PCF FILE if you want to combine into single file! Press OK if you want to keep separate files|, ||)
-
 	!save = !!ce.fullname
-
 	if !this.lstPipList.count eq 0 then
 		!!Alert.Warning(|Please Add Pipes.|)
 		return
 	endif
-
 	!pipes = !this.lstPipList.selection()
 	if !pipes.size() EQ 0 then
 		!!Alert.Warning(|Please select Pipes.|)
 		return
 	endif
-
 	!folder = object file(!!folderName)
 	if (!folder.exists() eq false) then
 		syscom |MD "$!{!!folderName}"|
 	endif
-
 	!!lines.clear()
 	!!lines.append(|ISOGEN-FILES            ISOGEN.FLS   |)
 	!!lines.append(|UNITS-BORE              INCH         |)
@@ -581,92 +402,139 @@ define method .Export(  )
 	!!lines.append(|UNITS-BOLT-LENGTH       MM           |)
 	!!lines.append(|UNITS-BOLT-DIA          INCH         |)
 	!!lines.append(|UNITS-WEIGHT            KGS          |)
-
 	do !pip values !pipes
 		$!pip
 		!this.Xuat()
 	enddo
-
 	if (!!namePCF neq ||) then
 		!safeName = !!namePCF.Replace('"','').Replace('*','').Replace('\','').Replace('/','').Replace('|','').Replace('?','').Replace(':','').Replace('<','').Replace('>','')
 		!pcfFileName = !!folderName & !safeName & |.pcf|
 		!file = object file(!pcfFileName)
 		!file.WriteFile(|OVERWRITE|, !!lines)
 	endif
-
 	$!save
 	!!Alert.Message(|Export PCF File Successfully.|)
 endmethod
-------------------------------------------------------------------------
-define method .Xuat()
-	!pip= !!ce
-	!collection = object collection()
-    !collection.addtype('BRAN')
-    !collection.scope(!!ce)
-	!results = !collection.results()
-    $* Get items by selected
-	!selected= Array()
-	!selected.AppendArray(!results)
-    !selected.unique()
-	if(!!namePCF eq '') then
-		!!lines.clear()
-		!!lines.append('ISOGEN-FILES            ISOGEN.FLS   ')
-		!!lines.append('UNITS-BORE              INCH         ')
-		!!lines.append('UNITS-CO-ORDS           MM           ')
-		!!lines.append('UNITS-BOLT-LENGTH       MM           ')
-		!!lines.append('UNITS-BOLT-DIA          INCH         ')
-		!!lines.append('UNITS-WEIGHT            KGS          ')
-    endif
-	do !j index !selected
-        !!ce = !selected[!j]
-		!itemName = !!ce.name
-		--$p $!itemName
-        $* Get item
-        !item = !itemName.dbref()
-        $* Create array to record data
-        --!lines  = array()
-        $********************************************************************
-        $* Ok begin tranfor model to pcf file
-        $********************************************************************
-        --Heading
-        !!lines.append('PIPELINE-REFERENCE      $!itemName   ')
-        
-        --Component data
-        !collection  = object collection()
-        !collection.addtype('BRAN MEM')
-        !collection.scope(!item)
-        !items = !collection.results()
-        -- OK begin read Component data
-        !find = !items.FindFirst(!item)
-        if(!find.set())then
-            !items.removefrom(!find, 1)
-        endif
-         
-        do !k index !items
-            --skip if(!items[!k].type eq 'BRAN')  $* Skip  if current item is a branch
-            !component = !items[!k]
-            !type = !component.type
-            !result = !this.$!<type>(!items, !k)  $* Call get data methods 
-            if(!result.empty())then   $* If not fit trans component to a MISC-COMPONENT
-                $*Skip if have one point only 
-                !test  = !component.ppbore[2]
-                skip if(!test.unset())
-                !result = !this.PCOM(!items, !k) $* Call PCOM method
-            else
-                !!lines.AppendArray(!result) $*Append data to array
-             endif   
-        enddo 
-    enddo
-	$********************************************************************
-	$*Create file and writing data
-	if(!!namePCF eq '') then
-		!pcfFileName = !!folderName + !pip.name.Replace('"','').Replace('*','').Replace('\','').Replace('/','').Replace('|','').Replace('?','').Replace(':','').Replace('<','').Replace('>','') + '.pcf'
-		!file = object file(!pcfFileName)
-		!file.WriteFile('OVERWRITE', !!lines)
-	endif
-endmethod
 
 ------------------------------------------------------------------------
+-- FIXED Xuat V4 - بدون .size() - نقرا مباشرة index 1..50
+------------------------------------------------------------------------
+define method .Xuat()
+    !pip = !!CE
+
+    !collection = object COLLECTION()
+    !collection.addtype('BRAN')
+    !collection.scope(!pip)
+    !results  = !collection.results()
+    !selected = object ARRAY()
+    !selected.AppendArray(!results)
+    !selected = !selected.unique()
+
+    $* ================= السبورتات =================
+    !supList = !this.GetSupports(!pip)
+
+    !msg = 'PIPE: ' & !pip.Name & '  |  Supports found: ' & !supList.size().String()
+    $p $!msg
+
+    if(!!namePCF EQ '') then
+        !!lines.clear()
+        !!lines.append('ISOGEN-FILES            ISOGEN.FLS   ')
+        !!lines.append('UNITS-BORE              INCH         ')
+        !!lines.append('UNITS-CO-ORDS           MM           ')
+        !!lines.append('UNITS-BOLT-LENGTH       MM           ')
+        !!lines.append('UNITS-BOLT-DIA          INCH         ')
+        !!lines.append('UNITS-WEIGHT            KGS          ')
+    endif
+
+    do !j index !selected
+        !branDb   = !selected[!j]
+        !itemName = !branDb.Name
+        !!lines.append('PIPELINE-REFERENCE      $!itemName   ')
+
+        !collection = object COLLECTION()
+        !collection.addtype('BRAN MEM')
+        !collection.scope(!branDb)
+        !items = !collection.results()
+        !find  = !items.FindFirst(!branDb)
+        if(!find.Set()) then
+            !items.removefrom(!find, 1)
+        endif
+
+        do !k index !items
+            !component = !items[!k]
+            !type      = !component.Type
+            !result    = !this.$!<type>(!items, !k)
+            if(!result.Empty()) then
+                !test = !component.ppbore[2]
+                skip if(!test.Unset())
+                !result = !this.PCOM(!items, !k)
+            else
+                !!lines.AppendArray(!result)
+            endif
+        enddo
+    enddo
+
+    $* ================= كتابة السبورتات =================
+    do !s index !supList
+        !supDb = !supList[!s]
+        skip if (!supDb.Type EQ 'ATTA')
+
+        $* --- POSITION ---
+        !posOK = TRUE
+        !pos = !supDb.Pos.Wrt(WORLD)
+        handle ANY
+            !posOK = FALSE
+        endhandle
+
+        if (!posOK EQ FALSE) then
+            !posOK = TRUE
+            !pos = !supDb.Attpos.Wrt(WORLD)
+            handle ANY
+                !posOK = FALSE
+            endhandle
+        endif
+        skip if (!posOK EQ FALSE)
+
+        !x = !pos.East.String(!this.positionFormat)
+        !y = !pos.North.String(!this.positionFormat)
+        !z = !pos.Up.String(!this.positionFormat)
+
+        $* --- BORE ---
+        !bore = '16.000000'
+        !bore = !pip.Hbore.String(!this.boreFormat)
+        handle ANY
+            !bore = '16.000000'
+        endhandle
+
+        $* --- SKEY ---
+        !skeyVal = 'REST'
+        !skeyVal = !supDb.Spref.Detref.Skey.String()
+        handle ANY
+            !skeyVal = 'REST'
+        endhandle
+        if (!skeyVal.Unset()) then
+            !skeyVal = 'REST'
+        endif
+        if (!skeyVal EQ '') then
+            !skeyVal = 'REST'
+        endif
+
+        !safeTag = !supDb.Name.Replace('"','')
+
+        !!lines.append('SUPPORT')
+        !!lines.append('    CO-ORDS    ' & !x & '  ' & !y & '  ' & !z & '  ' & !bore)
+        !!lines.append('    SKEY       ' & !skeyVal)
+        !!lines.append('    TAG        ' & !safeTag)
+    enddo
+
+    if(!!namePCF EQ '') then
+        !safePipName = !pip.Name.Replace('"','').Replace('*','').Replace('\','').Replace('/','').Replace('|','').Replace('?','').Replace(':','').Replace('<','').Replace('>','')
+        !pcfFileName = !!folderName & !safePipName & '.pcf'
+        !file = object FILE(!pcfFileName)
+        !file.WriteFile('OVERWRITE', !!lines)
+    endif
+endmethod
+
 define method .getMaterial(!item is dbref) is array 
     !result = array()
     !tempArray = !item.spref.name.split('/')
@@ -677,13 +545,11 @@ define method .getMaterial(!item is dbref) is array
     !result.append('    WEIGHT    0.1')
     return !result
 endmethod
-------------------------------------------------------------------------
+
 define method .ELBO(!items is array, !index is real) is array
      !lines = array()
      !component = !items[!index]
      !lines.append('ELBOW')
-     $* endpoint 
-     $* Arrive position 
      if(!index ne 1)then
         if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -693,43 +559,31 @@ define method .ELBO(!items is array, !index is real) is array
      else
         !arrivePosition = !component.apos.wrt(WORLD)
      endif 
-     $* Leave position
      !leavePosition = !component.lpos.wrt(WORLD)
-     $* Arrive bore  
      !arriveBore= !component.abore.string(!this.boreFormat)
-     $* Leave bore
      !leaveBore = !component.lbore.string(!this.boreFormat)
-     $*EndPoint
      !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
      !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
      !lines.append('    END-POINT    $!endPointArrive ' )
      !lines.append('    END-POINT    $!endPointLeave ' )
-     $*CENTRE-POINT 
      !centrePosition = !component.position.wrt(WORLD)
      !centrePoint = !centrePosition.east.string(!this.positionFormat) + '  ' + !centrePosition.north.string(!this.positionFormat) + '  ' + !centrePosition.up.string(!this.positionFormat) 
      !lines.append('    CENTRE-POINT     $!centrePoint ' )
-     $* Material
      !lines.appendArray(!this.getMaterial(!component))
-     $* SKEY 
      !skey = !component.spref.detref.skey       
      if(!skey.set())then
         !lines.append('    SKEY  $!skey')
      endif  
-     $* ANGLE
      !angle = !component.angle * 100
      !strAngle = before(!angle.string(),'degree')
-	 -- !strAngle = !angle.string(!this.angleFormat)
      !lines.append('    ANGLE  $!strAngle')
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .BEND(!items is array, !index is real) is array
      !lines = array()
      !component = !items[!index]
      !lines.append('BEND')
-     $* endpoint 
-     $* Arrive position 
      if(!index ne 1)then
         if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -739,48 +593,34 @@ define method .BEND(!items is array, !index is real) is array
      else
         !arrivePosition = !component.apos.wrt(WORLD)
      endif 
-     $* Leave position
      !leavePosition = !component.lpos.wrt(WORLD)
-     $* Arrive bore  
      !arriveBore= !component.abore.string(!this.boreFormat)
-     $* Leave bore
      !leaveBore = !component.lbore.string(!this.boreFormat)
-     $*EndPoint
      !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
      !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
      !lines.append('    END-POINT    $!endPointArrive ' )
      !lines.append('    END-POINT    $!endPointLeave ' )
-     $*CENTRE-POINT 
      !centrePosition = !component.position.wrt(WORLD)
      !centrePoint = !centrePosition.east.string(!this.positionFormat) + '  ' + !centrePosition.north.string(!this.positionFormat) + '  ' + !centrePosition.up.string(!this.positionFormat) 
      !lines.append('    CENTRE-POINT     $!centrePoint ' )
-     $* Material
      !lines.appendArray(!this.getMaterial(!component))
-     $* SKEY 
      !skey = !component.spref.detref.skey       
      if(!skey.set())then
         !lines.append('    SKEY  $!skey')
      endif  
-     $* ANGLE
      !angle = !component.angle * 100
      !strAngle = !angle.string(!this.angleFormat)
      !lines.append('    ANGLE  $!strAngle')
-     $* BEND-RADIUS
      !raduis = !leavePosition.distance(!centrePosition).string(!this.positionFormat)
      !lines.append('    BEND-RADIUS  $!raduis')
-     
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .TEE(!items is array, !index is real) is array
      !lines = array()
      !component = !items[!index]
-     $*********************************************
-     $*    Check, if item is an seton tee (TEE-SET-ON)
-     $*********************************************
      if(!component.ppos[1] eq !component.ppos[2])then
          !lines.append('TEE-SET-ON')
-         $* endpoint 
          if(!index ne 1)then
             if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -792,26 +632,19 @@ define method .TEE(!items is array, !index is real) is array
          endif 
          !position = !component.position.wrt(WORLD)
          !centrePoint = !position.east.string(!this.positionFormat) + ' ' + !position.north.string(!this.positionFormat) + ' ' + !position.up.string(!this.positionFormat)
-         !lines.append('    CENTRE-POINT   $!centrePoint')    $* CENTRE-POINT
+         !lines.append('    CENTRE-POINT   $!centrePoint')
          !branchPosition = !component.ppos[3].wrt(WORLD)
          !branchBore = !component.ppbore[3].string(!this.boreFormat)
          !branchPoint = !branchPosition.east.string(!this.positionFormat) + ' ' + !branchPosition.north.string(!this.positionFormat) + ' ' + !branchPosition.up.string(!this.positionFormat) + '  ' + !branchBore
-         !lines.append('    BRANCH1-POINT   $!branchPoint')   $* BRANCH1-POINT
-         $* Material
+         !lines.append('    BRANCH1-POINT   $!branchPoint')
          !lines.appendArray(!this.getMaterial(!component))
-         $* SKEY 
          !skey = !component.spref.detref.skey       
          if(!skey.set())then
             !lines.append('    SKEY  $!skey')
          endif
-         return !lines    $**Return Return Return Return ***
+         return !lines
      endif  
-     
-     $*********************************************
-     $*   General tee
-     $*********************************************
      !lines.append('TEE')
-     $* endpoint 
      if(!index ne 1)then
         if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -826,7 +659,7 @@ define method .TEE(!items is array, !index is real) is array
      !position1 = !component.ppos[1].wrt(WORLD)
      !position2 = !component.ppos[2].wrt(WORLD)
      !position3 = !component.ppos[3].wrt(WORLD)
-     !position$!<arriveNumber> = !arrivePosition      $* Overwrite pos
+     !position$!<arriveNumber> = !arrivePosition
      !bore1 = !component.ppbore[1].string(!this.boreFormat)
      !bore2 = !component.ppbore[2].string(!this.boreFormat)
      !bore3 = !component.ppbore[3].string(!this.boreFormat)
@@ -838,20 +671,16 @@ define method .TEE(!items is array, !index is real) is array
      !lines.append('     END-POINT    $!pos2')
      !lines.append('     CENTRE-POINT    $!pos0')
      !lines.append('     BRANCH1-POINT    $!pos3')
-     $* Material
      !lines.appendArray(!this.getMaterial(!component))
-     $* SKEY 
      !skey = !component.spref.detref.skey       
      if(!skey.set())then
         !lines.append('    SKEY  $!skey')
      endif  
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .VALV(!items is array, !index is real) is array
      !lines = array()
-     $*VALVE-ANGLE
       !component = !items[!index]
       !check = '2D 2Z AV AR AX'
       !checkArray = !check.split()
@@ -859,7 +688,6 @@ define method .VALV(!items is array, !index is real) is array
       !test = !checkArray.FindFirst(!finder)
       if(!test.set())then
          !lines.append('VALVE-ANGLE')
-         $* Arrive position 
          if(!index ne 1)then
             if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -869,40 +697,29 @@ define method .VALV(!items is array, !index is real) is array
          else
             !arrivePosition = !component.apos.wrt(WORLD)
          endif 
-         $* Leave position
          !leavePosition = !component.lpos.wrt(WORLD)
-         $* Arrive bore  
          !arriveBore= !component.abore.string(!this.boreFormat)
-         $* Leave bore
          !leaveBore = !component.lbore.string(!this.boreFormat)
-         $*EndPoint
          !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
          !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
          !lines.append('    END-POINT    $!endPointArrive ' )
          !lines.append('    END-POINT    $!endPointLeave ' )
-         $*CENTRE-POINT 
          !centrePosition = !component.position.wrt(WORLD)
          !centrePoint = !centrePosition.east.string(!this.positionFormat) + '  ' + !centrePosition.north.string(!this.positionFormat) + '  ' + !centrePosition.up.string(!this.positionFormat) 
          !lines.append('    CENTRE-POINT     $!centrePoint ' )
-         $* Material
         !lines.appendArray(!this.getMaterial(!component))
-        $* SKEY 
          !skey = !component.spref.detref.skey       
          if(!skey.set())then
             !lines.append('    SKEY  $!skey')
          endif  
          !lines.append('    CATEGORY  FIELD ')
      endif
-     
-     $*VALVE
      !check = 'NV KV VZ  ZB ZG VT VN VR VP VR VS VB VY VD VG VX VK VV VC CK'
      !checkArray = !check.split()
      !finder = !component.spref.detref.skey.substring(1,2)
      !test = !checkArray.FindFirst(!finder)
      if(!test.set())then
          !lines.append('VALVE')
-         $* endpoint 
-         $* Arrive position 
          if(!index ne 1)then
             if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -912,20 +729,14 @@ define method .VALV(!items is array, !index is real) is array
          else
             !arrivePosition = !component.apos.wrt(WORLD)
          endif 
-         $* Leave position
          !leavePosition = !component.lpos.wrt(WORLD)
-         $* Arrive bore  
          !arriveBore= !component.abore.string(!this.boreFormat)
-         $* Leave bore
          !leaveBore = !component.lbore.string(!this.boreFormat)
-         $*EndPoint
          !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
          !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
          !lines.append('    END-POINT    $!endPointArrive ' )
          !lines.append('    END-POINT    $!endPointLeave ' )
-         $* Material
         !lines.appendArray(!this.getMaterial(!component))
-        $* SKEY 
          !skey = !component.spref.detref.skey       
          if(!skey.set())then
             !lines.append('    SKEY  $!skey')
@@ -934,10 +745,9 @@ define method .VALV(!items is array, !index is real) is array
     !lines.append('    CATEGORY  ERECTION ')
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .REDU(!items is array, !index is real) is array
      !lines = array()
-     --CONCENTRIC
      !component = !items[!index]
      !checkString = 'CPBW CSBW CPFL CSFL RNSC RBSC RBSW'
      !checkArray = !checkString.split()
@@ -947,7 +757,6 @@ define method .REDU(!items is array, !index is real) is array
      if(!checkArray.findfirst(!component.spref.detref.skey).set())then
          !type = 'REDUCER-CONCENTRIC'
      endif
-     $*ECCENTRIC      
      !checkString = 'EPBW ESBW EPFL ESFL RFPL RCGL RCPF RCFA RCCL REGL REPF REFA RECL'
      !checkArray = !checkString.split()
      if(!component.spref.detref.skey.substring(1,2) eq 'RE')then
@@ -957,8 +766,6 @@ define method .REDU(!items is array, !index is real) is array
          !type = 'REDUCER-ECCENTRIC'
      endif
      !lines.append(!type)
-     $* endpoint 
-     $* Arrive position 
      if(!index ne 1)then
         if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -968,34 +775,25 @@ define method .REDU(!items is array, !index is real) is array
      else
         !arrivePosition = !component.apos.wrt(WORLD)
      endif 
-     $* Leave position
      !leavePosition = !component.lpos.wrt(WORLD)
-     $* Arrive bore  
      !arriveBore= !component.abore.string(!this.boreFormat)
-     $* Leave bore
      !leaveBore = !component.lbore.string(!this.boreFormat)
-     $*EndPoint
      !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
      !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
      !lines.append('    END-POINT    $!endPointArrive ' )
      !lines.append('    END-POINT    $!endPointLeave ' )
-     $* Material
      !lines.appendArray(!this.getMaterial(!component))
-     $* SKEY 
      !skey = !component.spref.detref.skey       
      if(!skey.set())then
         !lines.append('    SKEY  $!skey')
      endif  
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .FLAN(!items is array, !index is real) is array
      !lines = array()
      !component = !items[!index]
      !lines.append('FLANGE')
-     $* endpoint 
-     $* Arrive position 
      if(!index ne 1)then
         if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -1005,33 +803,25 @@ define method .FLAN(!items is array, !index is real) is array
      else
         !arrivePosition = !component.apos.wrt(WORLD)
      endif 
-     $* Leave position
      !leavePosition = !component.lpos.wrt(WORLD)
-     $* Arrive bore  
      !arriveBore= !component.abore.string(!this.boreFormat)
-     $* Leave bore
      !leaveBore = !component.lbore.string(!this.boreFormat)
-     $*EndPoint
      !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
      !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
      !lines.append('    END-POINT    $!endPointArrive ' )
      !lines.append('    END-POINT    $!endPointLeave ' )
-     $* Material
      !lines.appendArray(!this.getMaterial(!component))
-     $* SKEY 
      !skey = !component.spref.detref.skey       
      if(!skey.set())then
         !lines.append('    SKEY  $!skey')
      endif  
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .CROS(!items is array, !index is real) is array
      !lines = array()
      !component = !items[!index]
      !lines.append('CROSS')
-     $* endpoint 
      if(!index ne 1)then
         if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -1047,7 +837,7 @@ define method .CROS(!items is array, !index is real) is array
      !position2 = !component.ppos[2].wrt(WORLD)
      !position3 = !component.ppos[3].wrt(WORLD)
      !position4 = !component.ppos[4].wrt(WORLD)
-     !position$!<arriveNumber> = !arrivePosition      $* Overwrite pos
+     !position$!<arriveNumber> = !arrivePosition
      !bore1 = !component.ppbore[1].string(!this.boreFormat)
      !bore2 = !component.ppbore[2].string(!this.boreFormat)
      !bore3 = !component.ppbore[3].string(!this.boreFormat)
@@ -1062,23 +852,18 @@ define method .CROS(!items is array, !index is real) is array
      !lines.append('     CENTRE-POINT    $!pos0')
      !lines.append('     BRANCH1-POINT    $!pos3')
      !lines.append('     BRANCH2-POINT    $!pos4')
-     $* Material
      !lines.appendArray(!this.getMaterial(!component))
-     $* SKEY 
      !skey = !component.spref.detref.skey       
      if(!skey.set())then
         !lines.append('    SKEY  $!skey')
      endif  
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .GASK(!items is array, !index is real) is array
      !lines = array()
      !component = !items[!index]
      !lines.append('GASKET')
-     $* endpoint 
-     $* Arrive position 
      if(!index ne 1)then
         if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -1088,45 +873,35 @@ define method .GASK(!items is array, !index is real) is array
      else
         !arrivePosition = !component.apos.wrt(WORLD)
      endif 
-     $* Leave position
      !leavePosition = !component.lpos.wrt(WORLD)
-     $* Arrive bore  
      !arriveBore= !component.abore.string(!this.boreFormat)
-     $* Leave bore
      !leaveBore = !component.lbore.string(!this.boreFormat)
-     $*EndPoint
      !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
      !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
      !lines.append('    END-POINT    $!endPointArrive ' )
      !lines.append('    END-POINT    $!endPointLeave ' )
-     $* Material
      !lines.appendArray(!this.getMaterial(!component))
-     $* SKEY 
      !skey = !component.spref.detref.skey       
      if(!skey.set())then
         !lines.append('    SKEY  $!skey')
      endif  
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .DUCT(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .VENT(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .FTUB(!items is array, !index is real) is array
      !lines = array()
      !component = !items[!index]
      !lines.append('PIPE-FIXED')
-     $* endpoint 
-     $* Arrive position 
      if(!index ne 1)then
         if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -1136,39 +911,30 @@ define method .FTUB(!items is array, !index is real) is array
      else
         !arrivePosition = !component.apos.wrt(WORLD)
      endif 
-     $* Leave position
      !leavePosition = !component.lpos.wrt(WORLD)
-     $* Arrive bore  
      !arriveBore= !component.abore.string(!this.boreFormat)
-     $* Leave bore
      !leaveBore = !component.lbore.string(!this.boreFormat)
-     $*EndPoint
      !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
      !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
      !lines.append('    END-POINT    $!endPointArrive ' )
      !lines.append('    END-POINT    $!endPointLeave ' )
-     $* Material
      !lines.appendArray(!this.getMaterial(!component))
-     $* SKEY 
      !skey = !component.spref.detref.skey       
      if(!skey.set())then
         !lines.append('    SKEY  $!skey')
      endif  
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .SHU(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .COUP(!items is array, !index is real) is array
      !lines = array()
      !component = !items[!index]
      !lines.append('COUPLING')
-     $* endpoint 
-     $* Arrive position 
      if(!index ne 1)then
         if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -1178,38 +944,30 @@ define method .COUP(!items is array, !index is real) is array
      else
         !arrivePosition = !component.apos.wrt(WORLD)
      endif 
-     $* Leave position
      !leavePosition = !component.lpos.wrt(WORLD)
-     $* Arrive bore  
      !arriveBore= !component.abore.string(!this.boreFormat)
-     $* Leave bore
      !leaveBore = !component.lbore.string(!this.boreFormat)
-     $*EndPoint
      !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
      !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
      !lines.append('    END-POINT    $!endPointArrive ' )
      !lines.append('    END-POINT    $!endPointLeave ' )
-     $* Material
      !lines.appendArray(!this.getMaterial(!component))
-     $* SKEY 
      !skey = !component.spref.detref.skey       
      if(!skey.set())then
         !lines.append('    SKEY  $!skey')
      endif  
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .CLOS(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .OLET(!items is array, !index is real) is array
      !lines = array()
      !component = !items[!index]
      !lines.append('OLET')
-     $* endpoint 
      if(!index ne 1)then
         if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -1221,69 +979,58 @@ define method .OLET(!items is array, !index is real) is array
      endif 
      !position = !component.position.wrt(WORLD)
      !centrePoint = !position.east.string(!this.positionFormat) + ' ' + !position.north.string(!this.positionFormat) + ' ' + !position.up.string(!this.positionFormat)
-     !lines.append('    CENTRE-POINT   $!centrePoint')    $* CENTRE-POINT
+     !lines.append('    CENTRE-POINT   $!centrePoint')
      !branchPosition = !component.ppos[3].wrt(WORLD)
      !branchBore = !component.ppbore[3].string(!this.boreFormat)
      !branchPoint = !branchPosition.east.string(!this.positionFormat) + ' ' + !branchPosition.north.string(!this.positionFormat) + ' ' + !branchPosition.up.string(!this.positionFormat) + '  ' + !branchBore
-     !lines.append('    BRANCH1-POINT   $!branchPoint')   $* BRANCH1-POINT
-     $* Material
+     !lines.append('    BRANCH1-POINT   $!branchPoint')
      !lines.appendArray(!this.getMaterial(!component))
-     $* SKEY 
      !skey = !component.spref.detref.skey       
      if(!skey.set())then
         !lines.append('    SKEY  $!skey')
      endif   
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .LJSE(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .CAP(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .FBLI(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .VTWA(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .VFWA(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .TRAP(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .FILT(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .WELD(!items is array, !index is real) is array
      !lines = array()
      !component = !items[!index]
      !lines.append('WELD')
-     $* endpoint 
-     $* Arrive position 
      if(!index ne 1)then
         if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -1293,53 +1040,28 @@ define method .WELD(!items is array, !index is real) is array
      else
         !arrivePosition = !component.apos.wrt(WORLD)
      endif 
-     $* Leave position
      !leavePosition = !component.lpos.wrt(WORLD)
-	 -- ajout
-	 -- if !leavePosition eq !arrivePosition then
-	--	 if !component.ldir eq N then
-	--	 	!leavePosition.north = !leavePosition.north.wrt(WORLD) + 3
-	--	 elseif !component.ldir eq S then
-	--	 	!leavePosition.north = !leavePosition.north.wrt(WORLD) - 3
-	--	 elseif !component.ldir eq E then
-	--	 	!leavePosition.east = !leavePosition.east.wrt(WORLD) + 3
-	--	 elseif !component.ldir eq W then
-	--	 	!leavePosition.north = !leavePosition.east.wrt(WORLD) - 3
-	--	 elseif !component.ldir eq U then
-	--	 	!leavePosition.north = !leavePosition.up.wrt(WORLD) + 3
-	--	 elseif !component.ldir eq D then
-	--	 	!leavePosition.north = !leavePosition.up.wrt(WORLD) - 3
-	--	 endif
-	 -- endif
-	 -- fin ajout
-     $* Arrive bore  
      !arriveBore= !component.abore.string(!this.boreFormat)
-     $* Leave bore
      !leaveBore = !component.lbore.string(!this.boreFormat)
-     $*EndPoint
      !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
      !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
      !lines.append('    END-POINT    $!endPointArrive ' )
      !lines.append('    END-POINT    $!endPointLeave ' )
-     $* Material
      !lines.appendArray(!this.getMaterial(!component))
-     $* SKEY 
      !skey = !component.spref.detref.skey       
      if(!skey.set())then
         !lines.append('    SKEY  $!skey')
      endif  
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .PCOM(!items is array, !index is real) is array
         !lines = array()
         !component = !items[!index]
         !direction1 = !component.pdir[1]
         !direction2 = !component.pdir[2]
-        if(!direction1.Opposite() eq !direction2)then $*MISC-COMPONENT
+        if(!direction1.Opposite() eq !direction2)then
             !lines.append('MISC-COMPONENT')
-            $* endpoint 
-            $* Arrive position 
             if(!index ne 1)then
                 if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -1349,26 +1071,19 @@ define method .PCOM(!items is array, !index is real) is array
             else
                 !arrivePosition = !component.apos.wrt(WORLD)
             endif 
-            $* Leave position
             !leavePosition = !component.lpos.wrt(WORLD)
-            $* Arrive bore  
             !arriveBore= !component.abore.string(!this.boreFormat)
-            $* Leave bore
             !leaveBore = !component.lbore.string(!this.boreFormat)
-            $*EndPoint
             !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
             !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
             !lines.append('    END-POINT    $!endPointArrive ' )
             !lines.append('    END-POINT    $!endPointLeave ' )
-            $* Material
             !lines.appendArray(!this.getMaterial(!component))
-            $* SKEY 
             !skey = !component.spref.detref.skey       
             if(!skey.set())then
                 !lines.append('    SKEY  $!skey')
             endif  
-         elseif(!direction1.Angle(!direction2) eq 90)then $*MISC-COMPONENT-ANGLE  
-             $* Arrive position 
+         elseif(!direction1.Angle(!direction2) eq 90)then
              !lines.append('MISC-COMPONENT-ANGLE')
              if(!index ne 1)then
                 if(!items[!index - 1].type eq 'ATTA')then
@@ -1379,24 +1094,17 @@ define method .PCOM(!items is array, !index is real) is array
              else
                 !arrivePosition = !component.apos.wrt(WORLD)
              endif 
-             $* Leave position
              !leavePosition = !component.lpos.wrt(WORLD)
-             $* Arrive bore  
              !arriveBore= !component.abore.string(!this.boreFormat)
-             $* Leave bore
              !leaveBore = !component.lbore.string(!this.boreFormat)
-             $*EndPoint
              !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
              !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
              !lines.append('    END-POINT    $!endPointArrive ' )
              !lines.append('    END-POINT    $!endPointLeave ' )
-             $*CENTRE-POINT 
              !centrePosition = !component.position.wrt(WORLD)
              !centrePoint = !centrePosition.east.string(!this.positionFormat) + '  ' + !centrePosition.north.string(!this.positionFormat) + '  ' + !centrePosition.up.string(!this.positionFormat) 
              !lines.append('    CENTRE-POINT     $!centrePoint ' )
-             $* Material
             !lines.appendArray(!this.getMaterial(!component))
-            $* SKEY 
              !skey = !component.spref.detref.skey       
              if(!skey.set())then
                 !lines.append('    SKEY  $!skey')
@@ -1404,13 +1112,11 @@ define method .PCOM(!items is array, !index is real) is array
         endif
         return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .UNIO(!items is array, !index is real) is array
      !lines = array()
      !component = !items[!index]
      !lines.append('UNION')
-     $* endpoint 
-     $* Arrive position 
      if(!index ne 1)then
         if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -1420,40 +1126,30 @@ define method .UNIO(!items is array, !index is real) is array
      else
         !arrivePosition = !component.apos.wrt(WORLD)
      endif 
-     $* Leave position
      !leavePosition = !component.lpos.wrt(WORLD)
-     $* Arrive bore  
      !arriveBore= !component.abore.string(!this.boreFormat)
-     $* Leave bore
      !leaveBore = !component.lbore.string(!this.boreFormat)
-     $*EndPoint
      !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
      !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
      !lines.append('    END-POINT    $!endPointArrive ' )
      !lines.append('    END-POINT    $!endPointLeave ' )
-     $* Material
      !lines.appendArray(!this.getMaterial(!component))
-     $* SKEY 
      !skey = !component.spref.detref.skey       
      if(!skey.set())then
         !lines.append('    SKEY  $!skey')
      endif  
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .INST(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .ATTA(!items is array, !index is real) is array
      !lines = array()
-	-- support
 	!component = !items[!index]
-	--
 	!lines.append('SUPPORT')
-         $* endpoint 
          if(!index ne 1)then
             if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -1463,204 +1159,157 @@ define method .ATTA(!items is array, !index is real) is array
          else
             !arrivePosition = !component.apos.wrt(WORLD)
          endif 
-		 $* Arrive bore  
      !arriveBore= !component.abore.string(!this.boreFormat)
-     $* Leave bore
      !leaveBore = !component.lbore.string(!this.boreFormat)
          !position = !component.position.wrt(WORLD)
          !centrePoint = !position.east.string(!this.positionFormat) + ' ' + !position.north.string(!this.positionFormat) + ' ' + !position.up.string(!this.positionFormat) + ' ' + !leaveBore
-         !lines.append('    CO-ORDS   $!centrePoint')    $* CENTRE-POINT
-         $* Material
-         -- !lines.appendArray(!this.getMaterial(!component))
-         $* SKEY 
+         !lines.append('    CO-ORDS   $!centrePoint')
          !skey = !component.spref.detref.skey       
          if(!skey.set())then
             !lines.append('    SKEY  SKID')
 			!lines.append('    SUPPORT-DIRECTION UP')
-			-- $!skey')
          endif
-	
-	
      !lines.append('PIPE')
-     $* endpoint 
-     $* Arrive position 
      !arrivePosition = !component.apos.wrt(WORLD)
-     $* Leave position
 	 if(!index lt !items.size())then
 	    !leavePosition = !items[!index + 1].apos.wrt(WORLD)
      else
         !leavePosition = !component.lpos.wrt(WORLD)
      endif 
-	 
-	 $* Arrive bore  
      !arriveBore= !component.abore.string(!this.boreFormat)
-     $* Leave bore
      !leaveBore = !component.lbore.string(!this.boreFormat)
-     $*EndPoint
      !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
      !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
      !lines.append('    END-POINT    $!endPointArrive ' )
      !lines.append('    END-POINT    $!endPointLeave ' )
-	 -- center point
-	 -- !centrePosition = !component.position.wrt(WORLD)
-	 -- !centrePoint = !centrePosition.east.string(!this.positionFormat) + '  ' + !centrePosition.north.string(!this.positionFormat) + '  ' + !centrePosition.up.string(!this.positionFormat) 
-     -- !lines.append('    CENTRE-POINT     $!centrePoint ' )
-     $* Material
      !lines.appendArray(!this.getMaterial(!component))
-	
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .TAPE(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .TRNS(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .STRT(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .OFST(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .PLEN(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .PLAT(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .THRE(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .BRCO(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .MESH(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .GRIL(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .COWL(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .DAMP(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .HFAN(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .SILE(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .BATT(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .AHU(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .STIF(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .HACC(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .HSAD(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .IDAM(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .TP(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .SPLR(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .SKIR(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .FLEX(!items is array, !index is real) is array
      !lines = array()
-
      return !lines
 endmethod
-------------------------------------------------------------------------
+
 define method .TUBI(!items is array, !index is real) is array
      !lines = array()
      !component = !items[!index]
      !lines.append('PIPE')
-     $* endpoint 
-     $* Arrive position 
      if(!index ne 1)then
         if(!items[!index - 1].type eq 'ATTA')then
 			!arrivePosition = !component.apos.wrt(WORLD)
@@ -1670,24 +1319,68 @@ define method .TUBI(!items is array, !index is real) is array
      else
         !arrivePosition = !component.apos.wrt(WORLD)
      endif 
-     $* Leave position
--- modify for atta
      if(!index lt !items.size())then
 		!leavePosition = !items[!index + 1].apos.wrt(WORLD)
 	 else
 		!leavePosition = !component.lpos.wrt(WORLD)
 	 endif
-		
-     $* Arrive bore  
      !arriveBore= !component.abore.string(!this.boreFormat)
-     $* Leave bore
      !leaveBore = !component.lbore.string(!this.boreFormat)
-     $*EndPoint
      !endPointArrive = !arrivePosition.east.string(!this.positionFormat) + '  ' + !arrivePosition.north.string(!this.positionFormat) + '  ' + !arrivePosition.up.string(!this.positionFormat) + '  ' + !arriveBore
      !endPointLeave = !leavePosition.east.string(!this.positionFormat) + '  ' + !leavePosition.north.string(!this.positionFormat) + '  ' + !leavePosition.up.string(!this.positionFormat) + '  ' + !leaveBore
      !lines.append('    END-POINT    $!endPointArrive ' )
      !lines.append('    END-POINT    $!endPointLeave ' )
-     $* Material
      !lines.appendArray(!this.getMaterial(!component))
      return !lines
+endmethod
+define method .GetSupports(!pip is DBREF) is ARRAY
+
+    !out = object ARRAY()
+    !raw = object ARRAY()
+
+    $* ---- 1) نقرا الأتربيوت كله مرة واحدة ----
+    !raw = !pip.SupAllAncis
+    handle ANY
+        !raw = object ARRAY()
+    endhandle
+
+    $* ---- 2) لو فشل: نقرا عنصر عنصر 1..50 ----
+    if (!raw.size() EQ 0) then
+        do !i from 1 to 50
+            !ok = TRUE
+            !item = !pip.SupAllAncis[!i]
+            handle ANY
+                !ok = FALSE
+            endhandle
+            break if (!ok EQ FALSE)
+            break if (!item.unset())
+            !raw.append(!item)
+        enddo
+    endif
+
+    $* ---- 3) اسم بديل ----
+    if (!raw.size() EQ 0) then
+        !raw = !pip.SupAAncis
+        handle ANY
+            !raw = object ARRAY()
+        endhandle
+    endif
+
+    $* ---- 4) تحويل كل عنصر لـ DBREF سليم ----
+    do !ent values !raw
+        !db = !ent
+        if (!ent.ObjectType() NEQ 'DBREF') then
+            !ok = TRUE
+            !db = !ent.String().Trim().Dbref()
+            handle ANY
+                !ok = FALSE
+            endhandle
+            skip if (!ok EQ FALSE)
+        endif
+        skip if (!db.Unset())
+        skip if (!db.Type EQ 'NULL')
+        !out.append(!db)
+    enddo
+
+    return !out.unique()
 endmethod
